@@ -7,8 +7,10 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -18,11 +20,14 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.style.me.hd.R;
+import com.style.me.hd.global.helper.BitmapHelper;
 import com.style.me.hd.global.helper.FileHelper;
 import com.style.me.hd.global.helper.InputHelper;
 import com.style.me.hd.global.helper.ViewHelper;
 import com.style.me.hd.model.HomeModel;
 import com.style.me.hd.presenter.HomePresenter;
+import com.style.me.hd.widgets.MetaballView;
+import com.style.me.hd.widgets.SquareImageView;
 import com.style.me.hd.widgets.ZoomableImage;
 
 import org.adw.library.widgets.discreteseekbar.DiscreteSeekBar;
@@ -35,11 +40,21 @@ import butterknife.OnClick;
 
 public class Home extends AppCompatActivity implements HomeModel {
 
+    @Bind(R.id.frameImage)
+    SquareImageView frameImage;
+    @Bind(R.id.progressHolder)
+    LinearLayout progressHolder;
+    @Bind(R.id.appbar)
+    AppBarLayout appbar;
+    @Bind(R.id.metaball)
+    MetaballView metaball;
     private HomePresenter homePresenter;
     private ProgressDialog progressDialog;
     private File file;
     @Bind(R.id.toolbar)
     Toolbar toolbar;
+    @Bind(R.id.cardHolder)
+    CardView cardHolder;
     @Bind(R.id.zoomImage)
     ZoomableImage zoomImage;
     @Bind(R.id.cancel)
@@ -84,7 +99,7 @@ public class Home extends AppCompatActivity implements HomeModel {
             takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(file));
             startActivityForResult(takePictureIntent, HomePresenter.CAMERA_INTENT);
         } else {
-            onError("No Camera Found!");
+            onError(getString(R.string.no_camera));
         }
     }
 
@@ -102,6 +117,7 @@ public class Home extends AppCompatActivity implements HomeModel {
         setContentView(R.layout.activity_home);
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
+        metaball.setPaintMode(0);
         homePresenter = new HomePresenter(this);
     }
 
@@ -113,6 +129,10 @@ public class Home extends AppCompatActivity implements HomeModel {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.save) {
+            BitmapHelper.saveBitmap(cardHolder);
+            return true;
+        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -143,16 +163,23 @@ public class Home extends AppCompatActivity implements HomeModel {
 
     @Override
     public void showProgress() {
-        if (progressDialog != null && progressDialog.isShowing()) return;
-        if (progressDialog == null) progressDialog = new ProgressDialog(this);
-        progressDialog.setCancelable(false);
-        progressDialog.setMessage(getString(R.string.in_progress));
-        progressDialog.show();
+        ViewHelper.animateTranslateY(-appbar.getHeight(), false, appbar);
+        ViewHelper.animateTranslateY(optionsHolder.getHeight(), false, optionsHolder);
+        ViewHelper.animateVisibility(true, progressHolder);
+//        if (progressDialog != null && progressDialog.isShowing()) return;
+//        if (progressDialog == null) progressDialog = new ProgressDialog(this);
+//        progressDialog.setCancelable(false);
+//        progressDialog.setMessage(getString(R.string.in_progress));
+//        progressDialog.show();
     }
 
     @Override
     public void hideProgress() {
-        if (progressDialog != null && progressDialog.isShowing()) progressDialog.dismiss();
+//        if (progressDialog != null && progressDialog.isShowing()) progressDialog.dismiss();
+        ViewHelper.animateTranslateY(0, false, appbar);
+        ViewHelper.animateTranslateY(0, false, optionsHolder);
+        ViewHelper.animateVisibility(false, progressHolder);
+
     }
 
     @Override

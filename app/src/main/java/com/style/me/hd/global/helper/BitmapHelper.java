@@ -27,7 +27,7 @@ public class BitmapHelper {
 
     public static String saveBitmap(Bitmap image, String waterMark) {
         try {
-            File file = FileHelper.generatePrivateFile();
+            File file = FileHelper.generateFile();
             OutputStream fOut = new FileOutputStream(file);
             if (image.isMutable()) {
                 addWaterMark(image, waterMark).compress(Bitmap.CompressFormat.JPEG, 70, fOut);
@@ -52,7 +52,7 @@ public class BitmapHelper {
 
     public static String saveSignature(Bitmap image) {
         try {
-            File file = FileHelper.generatePrivateFile();
+            File file = FileHelper.generateFile();
             OutputStream fOut = new FileOutputStream(file);
             image.compress(Bitmap.CompressFormat.JPEG, 100, fOut);
             fOut.flush();
@@ -66,7 +66,7 @@ public class BitmapHelper {
 
     public static String saveSignature(Bitmap image, String waterMark) {
         try {
-            File file = FileHelper.generatePrivateFile();
+            File file = FileHelper.generateFile();
             OutputStream fOut = new FileOutputStream(file);
             if (image.isMutable()) {
                 addWaterMark(image, waterMark).compress(Bitmap.CompressFormat.JPEG, 100, fOut);
@@ -89,7 +89,7 @@ public class BitmapHelper {
 
     public static String saveBitmap(Bitmap image) {
         try {
-            File file = FileHelper.generatePrivateFile();
+            File file = FileHelper.generateFile();
             OutputStream fOut = new FileOutputStream(file);
             image.compress(Bitmap.CompressFormat.JPEG, 100, fOut);
             fOut.flush();
@@ -106,7 +106,7 @@ public class BitmapHelper {
         try {
             view.setDrawingCacheEnabled(true);
             Bitmap bitmap = view.getDrawingCache();
-            File file = FileHelper.generatePrivateFile();
+            File file = FileHelper.generateFile();
             OutputStream fOut = new FileOutputStream(file);
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fOut);
             fOut.flush();
@@ -180,7 +180,7 @@ public class BitmapHelper {
         return size;
     }
 
-    public static void loadImage(final HomeModel homeModel, File file) {
+    public static void loadImage(final HomeModel homeModel, final File file) {
         clearCache();
         AppController.getController().getImageLoader().displayImage("file:///" + file.getPath(),
                 homeModel.getImageView(), AppController.getController().getInMemoryOnly(), new SimpleImageLoadingListener() {
@@ -195,6 +195,7 @@ public class BitmapHelper {
                     public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
                         super.onLoadingComplete(imageUri, view, loadedImage);
                         homeModel.hideProgress();
+                        file.delete();
                     }
 
                     @Override

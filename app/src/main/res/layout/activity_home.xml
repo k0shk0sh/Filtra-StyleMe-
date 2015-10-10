@@ -9,6 +9,7 @@
     tools:context=".Home">
 
     <android.support.design.widget.AppBarLayout
+        android:id="@+id/appbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:theme="@style/ToolbarStyle">
@@ -33,11 +34,12 @@
     </android.support.design.widget.AppBarLayout>
 
     <com.style.me.hd.widgets.BoxCardLayout
+        android:id="@+id/cardHolder"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_margin="@dimen/activity_horizontal_margin"
         app:cardBackgroundColor="@color/accent"
-        app:cardCornerRadius="4dp"
+        app:cardElevation="4dp"
         app:cardMaxElevation="5dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
@@ -50,6 +52,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"/>
+
+            <com.style.me.hd.widgets.SquareImageView
+                android:id="@+id/frameImage"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/z8"/>
+
         </com.style.me.hd.widgets.BoxFrameLayout>
     </com.style.me.hd.widgets.BoxCardLayout>
 
@@ -169,6 +178,21 @@
                     android:src="@drawable/ic_filter_selector"
                     app:elevation="2dp"
                     app:rippleColor="?colorPrimary"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/progressHolder"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:visibility="gone">
+
+                <com.style.me.hd.widgets.MetaballView
+                    android:id="@+id/metaball"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"/>
             </LinearLayout>
         </FrameLayout>
     </LinearLayout>

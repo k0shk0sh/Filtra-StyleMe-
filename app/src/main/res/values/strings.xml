@@ -3,4 +3,5 @@
     <string name="in_progress">In Progress, Please Wait...</string>
     <string name="general_error_message">Error, Please Try Again Later</string>
     <string name="error_loading_image">Error Loading Image, Please try again!</string>
+    <string name="no_camera">No Camera Found!</string>
 </resources>
