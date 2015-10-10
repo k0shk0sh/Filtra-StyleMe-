@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".Home">
+
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/ToolbarStyle">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            android:theme="@style/ToolbarStyle"
+            app:layout_scrollFlags="scroll|enterAlways"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+
+            <com.style.me.hd.widgets.fonts.FontTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/app_name"
+                android:textColor="@color/white"
+                android:textSize="22sp"
+                android:textStyle="bold"/>
+        </android.support.v7.widget.Toolbar>
+    </android.support.design.widget.AppBarLayout>
+
+    <com.style.me.hd.widgets.BoxCardLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="@dimen/activity_horizontal_margin"
+        app:cardBackgroundColor="@color/accent"
+        app:cardCornerRadius="4dp"
+        app:cardMaxElevation="5dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <com.style.me.hd.widgets.ZoomableImage
+            android:id="@+id/zoomImage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"/>
+    </com.style.me.hd.widgets.BoxCardLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="10dp"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/recyclerHolder"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|left"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/cancel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="5dp"
+                android:layout_marginTop="10dp"
+                android:src="@drawable/ic_back_selector"
+                app:elevation="2dp"
+                app:rippleColor="?colorPrimary"/>
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recycler"
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:layout_gravity="center">
+            </android.support.v7.widget.RecyclerView>
+        </LinearLayout>
+
+        <org.adw.library.widgets.discreteseekbar.DiscreteSeekBar
+            android:id="@+id/seek"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:visibility="gone"
+            app:dsb_indicatorColor="@color/accent"
+            app:dsb_indicatorElevation="4dp"
+            app:dsb_max="100"
+            app:dsb_min="1"
+            app:dsb_progressColor="@color/accent"
+            app:dsb_rippleColor="@color/primary"
+            app:dsb_trackColor="@color/primaryDark"/>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:id="@+id/optionsHolder"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|center"
+                android:orientation="horizontal"
+                android:visibility="visible">
+
+                <android.support.design.widget.FloatingActionButton
+                    android:id="@+id/frames"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom|right|end"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_marginTop="10dp"
+                    android:src="@drawable/ic_frame_selector"
+                    app:elevation="2dp"
+                    app:rippleColor="?colorPrimary"/>
+
+                <android.support.design.widget.FloatingActionButton
+                    android:id="@+id/gallery"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom|right|end"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_marginTop="10dp"
+                    android:src="@drawable/ic_image_selector"
+                    app:elevation="2dp"
+                    app:rippleColor="?colorPrimary"/>
+
+                <android.support.design.widget.FloatingActionButton
+                    android:id="@+id/camera"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom|right|end"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_marginTop="10dp"
+                    android:src="@drawable/ic_camera_selector"
+                    app:elevation="2dp"
+                    app:rippleColor="?colorPrimary"/>
+
+                <android.support.design.widget.FloatingActionButton
+                    android:id="@+id/filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom|right|end"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_marginTop="10dp"
+                    android:src="@drawable/ic_filter_selector"
+                    app:elevation="2dp"
+                    app:rippleColor="?colorPrimary"/>
+            </LinearLayout>
+        </FrameLayout>
+    </LinearLayout>
+</android.support.design.widget.CoordinatorLayout>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/save"
+        android:icon="@drawable/ic_save_selector"
+        android:title="Save"
+        app:showAsAction="always"/>
+    <item
+        android:id="@+id/share"
+        android:icon="@drawable/ic_share_selector"
+        android:title="Share"
+        app:showAsAction="always"/>
+    <item
+        android:id="@+id/removeFilter"
+        android:icon="@drawable/ic_filter_off_selector"
+        android:title="Remove Filter"
+        app:showAsAction="always"/>
+    <item
+        android:id="@+id/removeBackground"
+        android:title="Remove Background"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/settings"
+        android:title="Settings"
+        app:showAsAction="never"/>
+</menu>
