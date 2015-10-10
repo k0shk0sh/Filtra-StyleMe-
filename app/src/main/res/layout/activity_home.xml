@@ -51,13 +51,14 @@
                 android:id="@+id/zoomImage"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_gravity="center"/>
+                android:layout_gravity="center"
+                android:contentDescription="@string/filtra_image"/>
 
             <com.style.me.hd.widgets.SquareImageView
                 android:id="@+id/frameImage"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:src="@drawable/z8"/>
+                android:contentDescription="@string/frame"/>
 
         </com.style.me.hd.widgets.BoxFrameLayout>
     </com.style.me.hd.widgets.BoxCardLayout>

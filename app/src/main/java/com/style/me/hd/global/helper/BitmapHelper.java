@@ -184,7 +184,7 @@ public class BitmapHelper {
     public static void loadImage(final HomeModel homeModel, final File file) {
         clearCache();
         AppController.getController().getImageLoader().displayImage("file:///" + file.getPath(),
-                homeModel.getImageView(), AppController.getController().getInMemoryOnly(), new SimpleImageLoadingListener() {
+                homeModel.getImageView(), AppController.getController().getDisplayOptions(), new SimpleImageLoadingListener() {
                     @Override
                     public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
                         super.onLoadingFailed(imageUri, view, failReason);
@@ -217,7 +217,7 @@ public class BitmapHelper {
     public static void loadImage(final HomeModel homeModel, Uri file) {
         clearCache();
         AppController.getController().getImageLoader().displayImage("" + file, homeModel.getImageView(), AppController.getController()
-                .getInMemoryOnly(), new SimpleImageLoadingListener() {
+                .getDisplayOptions(), new SimpleImageLoadingListener() {
             @Override
             public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
                 super.onLoadingFailed(imageUri, view, failReason);
@@ -255,12 +255,13 @@ public class BitmapHelper {
         Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
             public void onGenerated(Palette p) {
                 if (p != null) {
-                    Palette.Swatch vibrant = p.getVibrantSwatch();
-                    if (vibrant != null) {
-                        homeModel.onBackgroundApplied(vibrant.getRgb());
-                    } else {
-                        homeModel.onBackgroundApplied(p.getLightMutedColor(Color.parseColor("#00000000")));
-                    }
+                    homeModel.onBackgroundApplied(p.getDarkVibrantColor(Color.parseColor("#00000000")));
+//                    Palette.Swatch vibrant = p.getVibrantSwatch();
+//                    if (vibrant != null) {
+//                        homeModel.onBackgroundApplied(vibrant.getRgb());
+//                    } else {
+//                        homeModel.onBackgroundApplied(p.getLightMutedColor(Color.parseColor("#00000000")));
+//                    }
                 }
             }
         });

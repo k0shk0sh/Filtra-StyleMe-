@@ -4,4 +4,7 @@
     <string name="general_error_message">Error, Please Try Again Later</string>
     <string name="error_loading_image">Error Loading Image, Please try again!</string>
     <string name="no_camera">No Camera Found!</string>
+    <string name="share_to">"Share To: "</string>
+    <string name="frame">Frame</string>
+    <string name="filtra_image">Filtra Image</string>
 </resources>

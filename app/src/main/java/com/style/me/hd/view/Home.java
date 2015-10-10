@@ -78,12 +78,19 @@ public class Home extends AppCompatActivity implements HomeModel {
 
     @OnClick(R.id.filter)
     void onFilter() {
-        ViewHelper.animateVisibility(true, recyclerHolder);
+        if (!recyclerHolder.isShown())
+            ViewHelper.animateVisibility(true, recyclerHolder);
+        else
+            ViewHelper.animateVisibility(false, recyclerHolder);
     }
 
     @OnClick(R.id.frames)
     void onFrame() {
-        ViewHelper.animateVisibility(true, recyclerHolder);
+        if (!recyclerHolder.isShown())
+            ViewHelper.animateVisibility(true, recyclerHolder);
+        else
+            ViewHelper.animateVisibility(false, recyclerHolder);
+
     }
 
     @OnClick(R.id.cancel)
@@ -132,6 +139,13 @@ public class Home extends AppCompatActivity implements HomeModel {
         if (item.getItemId() == R.id.save) {
             BitmapHelper.saveBitmap(cardHolder);
             return true;
+        } else if (item.getItemId() == R.id.share) {
+            String path = BitmapHelper.saveBitmap(cardHolder);
+            Intent shareIntent = new Intent();
+            shareIntent.setAction(Intent.ACTION_SEND);
+            shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(new File(path)));
+            shareIntent.setType("image/*");
+            startActivity(Intent.createChooser(shareIntent, getString(R.string.share_to)));
         }
         return super.onOptionsItemSelected(item);
     }

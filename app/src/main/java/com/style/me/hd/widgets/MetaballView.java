@@ -15,6 +15,21 @@ import java.util.ArrayList;
 
 /**
  * Created by dodola on 15/7/27.
+ * The MIT License (MIT)
+ * <p/>
+ * Copyright (c) 2015 dodola
+ * <p/>
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the
+ * following conditions:
+ * <p/>
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+ * <p/>
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+ * CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
+ * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 public class MetaballView extends View {
 
@@ -171,7 +186,8 @@ public class MetaballView extends View {
         float angle2a = (float) (angle1 + Math.PI - u2 - (Math.PI - u2 - angle2) * v);
         float angle2b = (float) (angle1 - Math.PI + u2 + (Math.PI - u2 - angle2) * v);
 
-//        Log.d("Metaball", "angle1:" + angle1 + ",angle2:" + angle2 + ",angle1a:" + angle1a + ",angle1b:" + angle1b + ",angle2a:" + angle2a + ",angle2b:" + angle2b);
+//        Log.d("Metaball", "angle1:" + angle1 + ",angle2:" + angle2 + ",angle1a:" + angle1a + ",angle1b:" + angle1b + ",angle2a:" + angle2a + ",
+// angle2b:" + angle2b);
 
 
         float[] p1a1 = getVector(angle1a, radius1);
@@ -185,7 +201,8 @@ public class MetaballView extends View {
         float[] p2b = new float[]{p2b1[0] + center2[0], p2b1[1] + center2[1]};
 
 
-//        Log.d("Metaball", "p1a:" + Arrays.toString(p1a) + ",p1b:" + Arrays.toString(p1b) + ",p2a:" + Arrays.toString(p2a) + ",p2b:" + Arrays.toString(p2b));
+//        Log.d("Metaball", "p1a:" + Arrays.toString(p1a) + ",p1b:" + Arrays.toString(p1b) + ",p2a:" + Arrays.toString(p2a) + ",p2b:" + Arrays
+// .toString(p2b));
 
         float[] p1_p2 = new float[]{p1a[0] - p2a[0], p1a[1] - p2a[1]};
 
@@ -200,7 +217,8 @@ public class MetaballView extends View {
         float[] sp2 = getVector(angle2a + pi2, radius2);
         float[] sp3 = getVector(angle2b - pi2, radius2);
         float[] sp4 = getVector(angle1b + pi2, radius1);
-//        Log.d("Metaball", "sp1:" + Arrays.toString(sp1) + ",sp2:" + Arrays.toString(sp2) + ",sp3:" + Arrays.toString(sp3) + ",sp4:" + Arrays.toString(sp4));
+//        Log.d("Metaball", "sp1:" + Arrays.toString(sp1) + ",sp2:" + Arrays.toString(sp2) + ",sp3:" + Arrays.toString(sp3) + ",sp4:" + Arrays
+// .toString(sp4));
 
 
         Path path1 = new Path();

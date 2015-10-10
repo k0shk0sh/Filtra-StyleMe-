@@ -48,7 +48,7 @@ public class AppController extends Application {
                     .writeDebugLogs()
                     .diskCache(new LimitedAgeDiskCache(getCacheDir(), MAX_AGE))//for the sake of consider image exif
                     .threadPriority(Thread.MAX_PRIORITY)
-                    .defaultDisplayImageOptions(getInMemoryOnly())
+                    .defaultDisplayImageOptions(getDisplayOptions())
                     .denyCacheImageMultipleSizesInMemory()
                     .build();
             ImageLoader.getInstance().init(config);
@@ -56,7 +56,7 @@ public class AppController extends Application {
         return imageLoader;
     }
 
-    public DisplayImageOptions getInMemoryOnly() {
+    public DisplayImageOptions getDisplayOptions() {
         return new DisplayImageOptions.Builder()
                 .cacheOnDisk(true)
                 .cacheInMemory(true)
