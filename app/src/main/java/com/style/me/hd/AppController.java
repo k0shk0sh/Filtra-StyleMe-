@@ -5,6 +5,7 @@ import android.app.Application;
 import android.graphics.Bitmap;
 import android.util.Log;
 
+import com.nostra13.universalimageloader.cache.disc.impl.LimitedAgeDiskCache;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
@@ -21,6 +22,8 @@ public class AppController extends Application {
     private static AppController controller;
 
     private ImageLoader imageLoader;
+
+    private final int MAX_AGE = 1200000;//20minutes
 
     @Override
     public void onCreate() {
@@ -43,7 +46,9 @@ public class AppController extends Application {
         if (!imageLoader.isInited()) {
             ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(this)
                     .writeDebugLogs()
+                    .diskCache(new LimitedAgeDiskCache(getCacheDir(), MAX_AGE))//for the sake of consider image exif
                     .threadPriority(Thread.MAX_PRIORITY)
+                    .defaultDisplayImageOptions(getInMemoryOnly())
                     .denyCacheImageMultipleSizesInMemory()
                     .build();
             ImageLoader.getInstance().init(config);
@@ -53,11 +58,11 @@ public class AppController extends Application {
 
     public DisplayImageOptions getInMemoryOnly() {
         return new DisplayImageOptions.Builder()
-                .cacheOnDisk(false)
+                .cacheOnDisk(true)
                 .cacheInMemory(true)
-                .considerExifParams(true)
                 .imageScaleType(ImageScaleType.EXACTLY)
                 .bitmapConfig(Bitmap.Config.RGB_565)
+                .considerExifParams(true)
                 .build();
     }
 

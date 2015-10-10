@@ -2,6 +2,8 @@ package com.style.me.hd.model;
 
 import android.content.Intent;
 
+import java.io.File;
+
 import jp.co.cyberagent.android.gpuimage.GPUImageFilter;
 
 /**
@@ -9,9 +11,8 @@ import jp.co.cyberagent.android.gpuimage.GPUImageFilter;
  */
 public interface PresenterModel {
 
-    void onActivityForResult(int requestCode, int resultCode, Intent data);
+    void onActivityForResult(int requestCode, int resultCode, Intent data, File file);
 
     void onFilterClick(GPUImageFilter filter);
-
 
 }

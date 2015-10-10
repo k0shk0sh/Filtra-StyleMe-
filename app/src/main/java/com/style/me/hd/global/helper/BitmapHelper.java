@@ -4,9 +4,15 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.net.Uri;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
+
+import com.nostra13.universalimageloader.core.assist.FailReason;
+import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
+import com.style.me.hd.AppController;
+import com.style.me.hd.model.HomeModel;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -174,4 +180,70 @@ public class BitmapHelper {
         return size;
     }
 
+    public static void loadImage(final HomeModel homeModel, File file) {
+        clearCache();
+        AppController.getController().getImageLoader().displayImage("file:///" + file.getPath(),
+                homeModel.getImageView(), AppController.getController().getInMemoryOnly(), new SimpleImageLoadingListener() {
+                    @Override
+                    public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
+                        super.onLoadingFailed(imageUri, view, failReason);
+                        homeModel.hideProgress();
+                        homeModel.onError(null);
+                    }
+
+                    @Override
+                    public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
+                        super.onLoadingComplete(imageUri, view, loadedImage);
+                        homeModel.hideProgress();
+                    }
+
+                    @Override
+                    public void onLoadingStarted(String imageUri, View view) {
+                        super.onLoadingStarted(imageUri, view);
+                        homeModel.showProgress();
+                    }
+
+                    @Override
+                    public void onLoadingCancelled(String imageUri, View view) {
+                        super.onLoadingCancelled(imageUri, view);
+                        homeModel.hideProgress();
+                    }
+                });
+    }
+
+    public static void loadImage(final HomeModel homeModel, Uri file) {
+        clearCache();
+        AppController.getController().getImageLoader().displayImage("" + file, homeModel.getImageView(), AppController.getController()
+                .getInMemoryOnly(), new SimpleImageLoadingListener() {
+            @Override
+            public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
+                super.onLoadingFailed(imageUri, view, failReason);
+                homeModel.hideProgress();
+                homeModel.onError(null);
+            }
+
+            @Override
+            public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
+                super.onLoadingComplete(imageUri, view, loadedImage);
+                homeModel.hideProgress();
+            }
+
+            @Override
+            public void onLoadingStarted(String imageUri, View view) {
+                super.onLoadingStarted(imageUri, view);
+                homeModel.showProgress();
+            }
+
+            @Override
+            public void onLoadingCancelled(String imageUri, View view) {
+                super.onLoadingCancelled(imageUri, view);
+                homeModel.hideProgress();
+            }
+        });
+    }
+
+    public static void clearCache() {
+        AppController.getController().getImageLoader().clearDiskCache();
+        AppController.getController().getImageLoader().clearMemoryCache();
+    }
 }

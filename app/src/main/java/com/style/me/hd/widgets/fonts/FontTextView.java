@@ -26,7 +26,6 @@ public class FontTextView extends AppCompatTextView {
     }
 
     private void init() {
-        if (isInEditMode()) return;
         if (getTypeface() != null) {
             if (getTypeface().isBold()) {
                 Typeface myTypeface = Typeface.createFromAsset(getContext().getAssets(), "fonts/app_font_bold.ttf");
