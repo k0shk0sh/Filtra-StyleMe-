@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.net.Uri;
+import android.support.v7.graphics.Palette;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
@@ -194,6 +195,7 @@ public class BitmapHelper {
                     @Override
                     public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
                         super.onLoadingComplete(imageUri, view, loadedImage);
+                        applyPalette(homeModel, loadedImage);
                         homeModel.hideProgress();
                         file.delete();
                     }
@@ -226,6 +228,7 @@ public class BitmapHelper {
             @Override
             public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
                 super.onLoadingComplete(imageUri, view, loadedImage);
+                applyPalette(homeModel, loadedImage);
                 homeModel.hideProgress();
             }
 
@@ -246,5 +249,20 @@ public class BitmapHelper {
     public static void clearCache() {
         AppController.getController().getImageLoader().clearDiskCache();
         AppController.getController().getImageLoader().clearMemoryCache();
+    }
+
+    public static void applyPalette(final HomeModel homeModel, Bitmap bitmap) {
+        Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
+            public void onGenerated(Palette p) {
+                if (p != null) {
+                    Palette.Swatch vibrant = p.getVibrantSwatch();
+                    if (vibrant != null) {
+                        homeModel.onBackgroundApplied(vibrant.getRgb());
+                    } else {
+                        homeModel.onBackgroundApplied(p.getLightMutedColor(Color.parseColor("#00000000")));
+                    }
+                }
+            }
+        });
     }
 }

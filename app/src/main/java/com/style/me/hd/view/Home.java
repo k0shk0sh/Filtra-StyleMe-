@@ -148,7 +148,7 @@ public class Home extends AppCompatActivity implements HomeModel {
 
     @Override
     public void onBackgroundApplied(int color) {
-
+        cardHolder.setCardBackgroundColor(color);
     }
 
     @Override
