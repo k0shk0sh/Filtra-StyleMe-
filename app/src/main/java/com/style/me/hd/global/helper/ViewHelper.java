@@ -33,7 +33,7 @@ public class ViewHelper {
                     @Override
                     public void onAnimationEnd(@NonNull Animator animation) {
                         super.onAnimationEnd(animation);
-                        if (!show) view.setVisibility(View.GONE);
+                        if (!show) view.setVisibility(View.INVISIBLE);
                     }
                 });
     }

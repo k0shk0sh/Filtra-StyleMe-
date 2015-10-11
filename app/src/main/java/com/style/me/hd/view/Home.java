@@ -10,7 +10,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -56,7 +55,8 @@ public class Home extends AppCompatActivity implements HomeModel, ShakeDetector.
     private FilterAdjuster helper;
     private FiltersAdapter commonAdapter;
     private FramesAdapter framesAdapter;
-
+    private ShakeDetector shakeDetector;
+    private SensorManager sensorManager;
     @Bind(R.id.frameImage)
     SquareImageView frameImage;
     @Bind(R.id.progressHolder)
@@ -71,22 +71,12 @@ public class Home extends AppCompatActivity implements HomeModel, ShakeDetector.
     CardView cardHolder;
     @Bind(R.id.zoomImage)
     ZoomableImage zoomImage;
-    @Bind(R.id.cancel)
-    FloatingActionButton cancel;
     @Bind(R.id.recycler)
     RecyclerView recycler;
     @Bind(R.id.recyclerHolder)
     LinearLayout recyclerHolder;
     @Bind(R.id.seek)
     DiscreteSeekBar seek;
-    @Bind(R.id.frames)
-    FloatingActionButton frames;
-    @Bind(R.id.gallery)
-    FloatingActionButton gallery;
-    @Bind(R.id.camera)
-    FloatingActionButton camera;
-    @Bind(R.id.filter)
-    FloatingActionButton filter;
     @Bind(R.id.optionsHolder)
     LinearLayout optionsHolder;
 
@@ -157,9 +147,8 @@ public class Home extends AppCompatActivity implements HomeModel, ShakeDetector.
         recycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         recycler.setHasFixedSize(true);
         seek.setOnProgressChangeListener(onFilterAdjusted);
-        SensorManager sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-        ShakeDetector sd = new ShakeDetector(this);
-        sd.start(sensorManager);
+        sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        shakeDetector = new ShakeDetector(this);
     }
 
     @Override
@@ -172,30 +161,40 @@ public class Home extends AppCompatActivity implements HomeModel, ShakeDetector.
     public boolean onOptionsItemSelected(MenuItem item) {
         hideSeekBar();
         if (item.getItemId() == R.id.save) {
-            String path = BitmapHelper.saveBitmap(cardHolder);
-            if (!InputHelper.isEmpty(path)) {
-                onError("Image Saved.");
+            if (getBitmap() != null) {
+                String path = BitmapHelper.saveBitmap(cardHolder);
+                if (!InputHelper.isEmpty(path)) {
+                    onError(getString(R.string.image_saved));
+                } else {
+                    onError(getString(R.string.error_save));
+                }
             } else {
-                onError("Could not save image.");
+                onError(getString(R.string.no_image));
             }
             return true;
         } else if (item.getItemId() == R.id.share) {
-            String path = BitmapHelper.saveBitmap(cardHolder);
-            if (!InputHelper.isEmpty(path)) {
-                Intent shareIntent = new Intent();
-                shareIntent.setAction(Intent.ACTION_SEND);
-                shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(new File(path)));
-                shareIntent.setType("image/*");
-                startActivity(Intent.createChooser(shareIntent, getString(R.string.share_to)));
-                onError("Image Saved.");
+            if (getBitmap() != null) {
+                String path = BitmapHelper.saveBitmap(cardHolder);
+                if (!InputHelper.isEmpty(path)) {
+                    Intent shareIntent = new Intent();
+                    shareIntent.setAction(Intent.ACTION_SEND);
+                    shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(new File(path)));
+                    shareIntent.setType("image/*");
+                    startActivity(Intent.createChooser(shareIntent, getString(R.string.share_to)));
+                    onError(getString(R.string.image_saved));
+                } else {
+                    onError(getString(R.string.error_save));
+                }
             } else {
-                onError("Could not save image.");
+                onError(getString(R.string.no_image));
             }
             return true;
         } else if (item.getItemId() == R.id.removeFilter) {
             if (getBitmap() != null) {
                 zoomImage.setImageBitmap(getBitmap());
                 homePresenter.getGpuImage().deleteImage();
+            } else {
+                onError(getString(R.string.no_image));
             }
             return true;
         } else if (item.getItemId() == R.id.removeBackground) {
@@ -206,6 +205,25 @@ public class Home extends AppCompatActivity implements HomeModel, ShakeDetector.
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (!bitmap.isRecycled()) bitmap.recycle();
+        if (homePresenter.getGpuImage() != null) homePresenter.getGpuImage().deleteImage();
+        super.onDestroy();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        shakeDetector.stop();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        shakeDetector.start(sensorManager);
     }
 
     @Override
@@ -264,13 +282,6 @@ public class Home extends AppCompatActivity implements HomeModel, ShakeDetector.
     }
 
     @Override
-    protected void onDestroy() {
-        if (!bitmap.isRecycled()) bitmap.recycle();
-        if (homePresenter.getGpuImage() != null) homePresenter.getGpuImage().deleteImage();
-        super.onDestroy();
-    }
-
-    @Override
     public void showSeekBar(FilterAdjuster helper) {
         this.helper = helper;
         seek.setProgress(20);
@@ -301,14 +312,10 @@ public class Home extends AppCompatActivity implements HomeModel, ShakeDetector.
         }
 
         @Override
-        public void onStartTrackingTouch(DiscreteSeekBar seekBar) {
-
-        }
+        public void onStartTrackingTouch(DiscreteSeekBar seekBar) {}
 
         @Override
-        public void onStopTrackingTouch(DiscreteSeekBar seekBar) {
-
-        }
+        public void onStopTrackingTouch(DiscreteSeekBar seekBar) {}
     };
 
     @Override

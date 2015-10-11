@@ -8,4 +8,6 @@
     <string name="frame">Frame</string>
     <string name="filtra_image">Filtra Image</string>
     <string name="no_image">Error, No Image Found.</string>
+    <string name="error_save">Could not save image.</string>
+    <string name="image_saved">Image Saved.</string>
 </resources>
