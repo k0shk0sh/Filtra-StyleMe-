@@ -3,6 +3,9 @@ package com.style.me.hd.view;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.hardware.SensorManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -20,8 +23,10 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.squareup.seismic.ShakeDetector;
 import com.style.me.hd.R;
 import com.style.me.hd.global.adapter.FiltersAdapter;
+import com.style.me.hd.global.adapter.FramesAdapter;
 import com.style.me.hd.global.filter.FilterModel;
 import com.style.me.hd.global.filter.adjuster.FilterAdjuster;
 import com.style.me.hd.global.helper.BitmapHelper;
@@ -37,17 +42,20 @@ import com.style.me.hd.widgets.ZoomableImage;
 import org.adw.library.widgets.discreteseekbar.DiscreteSeekBar;
 
 import java.io.File;
+import java.util.Random;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class Home extends AppCompatActivity implements HomeModel {
+public class Home extends AppCompatActivity implements HomeModel, ShakeDetector.Listener {
 
     private HomePresenter homePresenter;
     private File file;
     private Bitmap bitmap;
     private FilterAdjuster helper;
+    private FiltersAdapter commonAdapter;
+    private FramesAdapter framesAdapter;
 
     @Bind(R.id.frameImage)
     SquareImageView frameImage;
@@ -81,32 +89,40 @@ public class Home extends AppCompatActivity implements HomeModel {
     FloatingActionButton filter;
     @Bind(R.id.optionsHolder)
     LinearLayout optionsHolder;
-    private FiltersAdapter commonAdapter;
 
     @OnClick(R.id.filter)
     void onFilter() {
-        if (!recyclerHolder.isShown())
-            ViewHelper.animateVisibility(true, recyclerHolder);
-        else
-            ViewHelper.animateVisibility(false, recyclerHolder);
+        hideSeekBar();
+        if (recycler.getAdapter() == null) {
+            recycler.setAdapter(commonAdapter);
+        }
+        if (recycler.getAdapter() instanceof FramesAdapter) {
+            recycler.setAdapter(commonAdapter);
+        }
+        ViewHelper.animateVisibility(true, recyclerHolder);
     }
 
     @OnClick(R.id.frames)
     void onFrame() {
-        if (!recyclerHolder.isShown())
-            ViewHelper.animateVisibility(true, recyclerHolder);
-        else
-            ViewHelper.animateVisibility(false, recyclerHolder);
-
+        hideSeekBar();
+        if (recycler.getAdapter() == null) {
+            recycler.setAdapter(framesAdapter);
+        }
+        if (recycler.getAdapter() instanceof FiltersAdapter) {
+            recycler.setAdapter(framesAdapter);
+        }
+        ViewHelper.animateVisibility(true, recyclerHolder);
     }
 
     @OnClick(R.id.cancel)
     void onCancel() {
         ViewHelper.animateVisibility(false, recyclerHolder);
+        hideSeekBar();
     }
 
     @OnClick(R.id.camera)
     void onCamera() {
+        hideSeekBar();
         file = FileHelper.generateFile();
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
@@ -119,6 +135,7 @@ public class Home extends AppCompatActivity implements HomeModel {
 
     @OnClick(R.id.gallery)
     void onGallery() {
+        hideSeekBar();
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         intent.setType("image/*");
         startActivityForResult(Intent.createChooser(intent, "Select Image"), HomePresenter.GALLERY_INTENT);
@@ -135,11 +152,14 @@ public class Home extends AppCompatActivity implements HomeModel {
         homePresenter = new HomePresenter(this);
         FilterModel filter = new FilterModel(this);
         commonAdapter = new FiltersAdapter(homePresenter, filter.getFilters());
+        framesAdapter = new FramesAdapter(homePresenter, getResources().getStringArray(R.array.colors));
         recycler.setItemAnimator(new DefaultItemAnimator());
         recycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         recycler.setHasFixedSize(true);
-        recycler.setAdapter(commonAdapter);
         seek.setOnProgressChangeListener(onFilterAdjusted);
+        SensorManager sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        ShakeDetector sd = new ShakeDetector(this);
+        sd.start(sensorManager);
     }
 
     @Override
@@ -150,22 +170,39 @@ public class Home extends AppCompatActivity implements HomeModel {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        hideSeekBar();
         if (item.getItemId() == R.id.save) {
-            BitmapHelper.saveBitmap(cardHolder);
+            String path = BitmapHelper.saveBitmap(cardHolder);
+            if (!InputHelper.isEmpty(path)) {
+                onError("Image Saved.");
+            } else {
+                onError("Could not save image.");
+            }
             return true;
         } else if (item.getItemId() == R.id.share) {
             String path = BitmapHelper.saveBitmap(cardHolder);
-            Intent shareIntent = new Intent();
-            shareIntent.setAction(Intent.ACTION_SEND);
-            shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(new File(path)));
-            shareIntent.setType("image/*");
-            startActivity(Intent.createChooser(shareIntent, getString(R.string.share_to)));
+            if (!InputHelper.isEmpty(path)) {
+                Intent shareIntent = new Intent();
+                shareIntent.setAction(Intent.ACTION_SEND);
+                shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(new File(path)));
+                shareIntent.setType("image/*");
+                startActivity(Intent.createChooser(shareIntent, getString(R.string.share_to)));
+                onError("Image Saved.");
+            } else {
+                onError("Could not save image.");
+            }
             return true;
         } else if (item.getItemId() == R.id.removeFilter) {
             if (getBitmap() != null) {
                 zoomImage.setImageBitmap(getBitmap());
                 homePresenter.getGpuImage().deleteImage();
             }
+            return true;
+        } else if (item.getItemId() == R.id.removeBackground) {
+            cardHolder.setCardBackgroundColor(0);
+            return true;
+        } else if (item.getItemId() == R.id.removeFrame) {
+            frameImage.setImageDrawable(null);
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -187,8 +224,8 @@ public class Home extends AppCompatActivity implements HomeModel {
     }
 
     @Override
-    public void onFrameSelected(int resId) {
-
+    public void onFrameSelected(Drawable drawable) {
+        frameImage.setImageDrawable(drawable);
     }
 
     @Override
@@ -227,8 +264,16 @@ public class Home extends AppCompatActivity implements HomeModel {
     }
 
     @Override
+    protected void onDestroy() {
+        if (!bitmap.isRecycled()) bitmap.recycle();
+        if (homePresenter.getGpuImage() != null) homePresenter.getGpuImage().deleteImage();
+        super.onDestroy();
+    }
+
+    @Override
     public void showSeekBar(FilterAdjuster helper) {
         this.helper = helper;
+        seek.setProgress(20);
         ViewHelper.animateVisibility(true, seek);
     }
 
@@ -246,9 +291,13 @@ public class Home extends AppCompatActivity implements HomeModel {
     private DiscreteSeekBar.OnProgressChangeListener onFilterAdjusted = new DiscreteSeekBar.OnProgressChangeListener() {
         @Override
         public void onProgressChanged(DiscreteSeekBar seekBar, int value, boolean fromUser) {
-            if (helper != null) helper.adjust(value);
-            homePresenter.getGpuImage().requestRender();
-            onFilterApplied(homePresenter.getGpuImage().getBitmapWithFilterApplied());
+            if (homePresenter.getGpuImage().getBitmapWithFilterApplied() != null) {
+                if (helper != null) helper.adjust(value);
+                homePresenter.getGpuImage().requestRender();
+                onFilterApplied(homePresenter.getGpuImage().getBitmapWithFilterApplied());
+            } else {
+                ViewHelper.animateVisibility(fromUser, seekBar);
+            }
         }
 
         @Override
@@ -261,4 +310,15 @@ public class Home extends AppCompatActivity implements HomeModel {
 
         }
     };
+
+    @Override
+    public void hearShake() {
+        if (getBitmap() == null) {
+            onError(getString(R.string.no_image));
+            return;
+        }
+        homePresenter.onFilterClick(commonAdapter.getFilterModelList().get(new Random().nextInt(commonAdapter.getItemCount() - 1)));
+        homePresenter.onBakcgroundClick(Color.parseColor(framesAdapter.getColors()[new Random().nextInt(framesAdapter.getItemCount() - 1)]));
+        homePresenter.onFrameClick(Color.parseColor(framesAdapter.getColors()[new Random().nextInt(framesAdapter.getItemCount() - 1)]));
+    }
 }

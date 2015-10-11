@@ -47,8 +47,8 @@ public class BitmapHelper {
             return file.getPath();
         } catch (Exception e) {
             Log.e("BitmapUtil", "SaveBitmap", e);
-            return "because-android-sucks";
         }
+        return null;
     }
 
     public static String saveSignature(Bitmap image) {
@@ -61,8 +61,8 @@ public class BitmapHelper {
             return file.getAbsolutePath();
         } catch (Exception e) {
             Log.e("BitmapUtil", "SaveBitmap", e);
-            return "because-android-sucks";
         }
+        return null;
     }
 
     public static String saveSignature(Bitmap image, String waterMark) {
@@ -84,8 +84,8 @@ public class BitmapHelper {
             return file.getAbsolutePath();
         } catch (Exception e) {
             Log.e("BitmapUtil", "SaveBitmap", e);
-            return "because-android-sucks";
         }
+        return null;
     }
 
     public static String saveBitmap(Bitmap image) {
@@ -99,8 +99,8 @@ public class BitmapHelper {
             return file.getPath();
         } catch (Exception e) {
             Log.e("BitmapUtil", "SaveBitmap", e);
-            return "because-android-sucks";
         }
+        return null;
     }
 
     public static String saveBitmap(View view) {
@@ -117,8 +117,8 @@ public class BitmapHelper {
             return file.getPath();
         } catch (Exception e) {
             Log.e("BitmapUtil", "SaveBitmap", e);
-            return "because-android-sucks";
         }
+        return null;
     }
 
     public static String bitmapToBase64(Bitmap bmp) {

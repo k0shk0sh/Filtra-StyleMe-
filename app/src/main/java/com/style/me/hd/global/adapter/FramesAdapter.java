@@ -1,5 +1,6 @@
 package com.style.me.hd.global.adapter;
 
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,27 +8,23 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.amulyakhare.textdrawable.TextDrawable;
-import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.style.me.hd.R;
-import com.style.me.hd.global.filter.FilterModel;
 import com.style.me.hd.presenter.HomePresenter;
-
-import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
 /**
  * Created by Kosh on 10/11/2015. copyrights are reserved
- * h566UniFi
  */
-public class FiltersAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    private List<FilterModel> filterModelList;
+public class FramesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+
+    private String[] colors;
     private HomePresenter homePresenter;
 
-    public FiltersAdapter(HomePresenter homePresenter, List<FilterModel> filterModelList) {
+    public FramesAdapter(HomePresenter homePresenter, String[] colors) {
         this.homePresenter = homePresenter;
-        this.filterModelList = filterModelList;
+        this.colors = colors;
     }
 
     @Override
@@ -39,8 +36,7 @@ public class FiltersAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, final int position) {
         CommonHolder holder = (CommonHolder) viewHolder;
-        ColorGenerator generator = ColorGenerator.MATERIAL;
-        int color = generator.getColor(position);
+        int color = Color.parseColor(colors[position]);
         TextDrawable.IBuilder builder = TextDrawable.builder()
                 .beginConfig()
                 .endConfig()
@@ -49,20 +45,26 @@ public class FiltersAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                homePresenter.onFilterClick(filterModelList.get(position));
+                homePresenter.onFrameClick(Color.parseColor(colors[position]));
+            }
+        });
+        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                homePresenter.onBakcgroundClick(Color.parseColor(colors[position]));
+                return true;
             }
         });
     }
 
     @Override
     public int getItemCount() {
-        return filterModelList.size();
+        return colors.length;
     }
 
-    public List<FilterModel> getFilterModelList() {
-        return filterModelList;
+    public String[] getColors() {
+        return colors;
     }
-
 
     class CommonHolder extends RecyclerView.ViewHolder {
         @Bind(R.id.fabImage)

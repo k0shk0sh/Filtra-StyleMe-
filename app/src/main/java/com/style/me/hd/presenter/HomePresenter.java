@@ -3,6 +3,7 @@ package com.style.me.hd.presenter;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 
 import com.style.me.hd.R;
@@ -66,6 +67,19 @@ public class HomePresenter implements PresenterModel {
             homeModel.hideSeekBar();
         }
         homeModel.onFilterApplied(gpuFilter.getBitmapWithFilterApplied());
+
+    }
+
+    @Override
+    public void onFrameClick(int color) {
+        final GradientDrawable dr = new GradientDrawable();
+        dr.setStroke(20, color);
+        homeModel.onFrameSelected(dr);
+    }
+
+    @Override
+    public void onBakcgroundClick(int color) {
+        homeModel.onBackgroundApplied(color);
 
     }
 

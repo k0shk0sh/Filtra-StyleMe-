@@ -22,6 +22,10 @@
         android:title="Remove Background"
         app:showAsAction="never"/>
     <item
+        android:id="@+id/removeFrame"
+        android:title="Remove Frame"
+        app:showAsAction="never"/>
+    <item
         android:id="@+id/settings"
         android:title="Settings"
         app:showAsAction="never"/>

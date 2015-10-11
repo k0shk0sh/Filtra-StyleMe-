@@ -15,4 +15,7 @@ public interface PresenterModel {
 
     void onFilterClick(FilterModel filter);
 
+    void onFrameClick(int color);
+
+    void onBakcgroundClick(int color);
 }

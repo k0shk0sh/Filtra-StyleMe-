@@ -2,6 +2,7 @@ package com.style.me.hd.model;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.widget.ImageView;
 
 import com.style.me.hd.global.filter.adjuster.FilterAdjuster;
@@ -17,7 +18,7 @@ public interface HomeModel {
 
     void onBackgroundApplied(int color);
 
-    void onFrameSelected(int resId);
+    void onFrameSelected(Drawable drawable);
 
     void onError(String cause);
 

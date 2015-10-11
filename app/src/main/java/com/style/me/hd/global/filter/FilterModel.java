@@ -1,6 +1,7 @@
 package com.style.me.hd.global.filter;
 
 import android.content.Context;
+import android.graphics.PointF;
 
 import com.style.me.hd.global.helper.AdjusterHelper;
 
@@ -180,7 +181,10 @@ public class FilterModel {
         filterModels.add(adjust);
         adjust = new FilterModel();
         adjust.setAdjustable(true);
-        adjust.setFilter(new GPUImageVignetteFilter());
+        PointF centerPoint = new PointF();
+        centerPoint.x = 0.5f;
+        centerPoint.y = 0.5f;
+        adjust.setFilter(new GPUImageVignetteFilter(centerPoint, new float[]{0.0f, 0.0f, 0.0f}, 0.3f, 0.75f));
         filterModels.add(adjust);
         adjust = new FilterModel();
         adjust.setAdjustable(true);
