@@ -1,6 +1,5 @@
 package com.style.me.hd.view;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -11,6 +10,8 @@ import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -20,6 +21,9 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.style.me.hd.R;
+import com.style.me.hd.global.adapter.FiltersAdapter;
+import com.style.me.hd.global.filter.FilterModel;
+import com.style.me.hd.global.filter.adjuster.FilterAdjuster;
 import com.style.me.hd.global.helper.BitmapHelper;
 import com.style.me.hd.global.helper.FileHelper;
 import com.style.me.hd.global.helper.InputHelper;
@@ -40,6 +44,11 @@ import butterknife.OnClick;
 
 public class Home extends AppCompatActivity implements HomeModel {
 
+    private HomePresenter homePresenter;
+    private File file;
+    private Bitmap bitmap;
+    private FilterAdjuster helper;
+
     @Bind(R.id.frameImage)
     SquareImageView frameImage;
     @Bind(R.id.progressHolder)
@@ -48,9 +57,6 @@ public class Home extends AppCompatActivity implements HomeModel {
     AppBarLayout appbar;
     @Bind(R.id.metaball)
     MetaballView metaball;
-    private HomePresenter homePresenter;
-    private ProgressDialog progressDialog;
-    private File file;
     @Bind(R.id.toolbar)
     Toolbar toolbar;
     @Bind(R.id.cardHolder)
@@ -75,6 +81,7 @@ public class Home extends AppCompatActivity implements HomeModel {
     FloatingActionButton filter;
     @Bind(R.id.optionsHolder)
     LinearLayout optionsHolder;
+    private FiltersAdapter commonAdapter;
 
     @OnClick(R.id.filter)
     void onFilter() {
@@ -126,6 +133,13 @@ public class Home extends AppCompatActivity implements HomeModel {
         setSupportActionBar(toolbar);
         metaball.setPaintMode(0);
         homePresenter = new HomePresenter(this);
+        FilterModel filter = new FilterModel(this);
+        commonAdapter = new FiltersAdapter(homePresenter, filter.getFilters());
+        recycler.setItemAnimator(new DefaultItemAnimator());
+        recycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        recycler.setHasFixedSize(true);
+        recycler.setAdapter(commonAdapter);
+        seek.setOnProgressChangeListener(onFilterAdjusted);
     }
 
     @Override
@@ -146,6 +160,13 @@ public class Home extends AppCompatActivity implements HomeModel {
             shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(new File(path)));
             shareIntent.setType("image/*");
             startActivity(Intent.createChooser(shareIntent, getString(R.string.share_to)));
+            return true;
+        } else if (item.getItemId() == R.id.removeFilter) {
+            if (getBitmap() != null) {
+                zoomImage.setImageBitmap(getBitmap());
+                homePresenter.getGpuImage().deleteImage();
+            }
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -157,7 +178,7 @@ public class Home extends AppCompatActivity implements HomeModel {
 
     @Override
     public void onFilterApplied(Bitmap bitmap) {
-
+        zoomImage.setImageBitmap(bitmap);
     }
 
     @Override
@@ -180,20 +201,24 @@ public class Home extends AppCompatActivity implements HomeModel {
         ViewHelper.animateTranslateY(-appbar.getHeight(), false, appbar);
         ViewHelper.animateTranslateY(optionsHolder.getHeight(), false, optionsHolder);
         ViewHelper.animateVisibility(true, progressHolder);
-//        if (progressDialog != null && progressDialog.isShowing()) return;
-//        if (progressDialog == null) progressDialog = new ProgressDialog(this);
-//        progressDialog.setCancelable(false);
-//        progressDialog.setMessage(getString(R.string.in_progress));
-//        progressDialog.show();
     }
 
     @Override
     public void hideProgress() {
-//        if (progressDialog != null && progressDialog.isShowing()) progressDialog.dismiss();
         ViewHelper.animateTranslateY(0, false, appbar);
         ViewHelper.animateTranslateY(0, false, optionsHolder);
         ViewHelper.animateVisibility(false, progressHolder);
 
+    }
+
+    @Override
+    public void setBitmap(Bitmap bitmap) {
+        this.bitmap = bitmap;
+    }
+
+    @Override
+    public Bitmap getBitmap() {
+        return bitmap;
     }
 
     @Override
@@ -202,9 +227,38 @@ public class Home extends AppCompatActivity implements HomeModel {
     }
 
     @Override
+    public void showSeekBar(FilterAdjuster helper) {
+        this.helper = helper;
+        ViewHelper.animateVisibility(true, seek);
+    }
+
+    @Override
+    public void hideSeekBar() {
+        ViewHelper.animateVisibility(false, seek);
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         homePresenter.onActivityForResult(requestCode, resultCode, data, file);
         super.onActivityResult(requestCode, resultCode, data);
     }
 
+    private DiscreteSeekBar.OnProgressChangeListener onFilterAdjusted = new DiscreteSeekBar.OnProgressChangeListener() {
+        @Override
+        public void onProgressChanged(DiscreteSeekBar seekBar, int value, boolean fromUser) {
+            if (helper != null) helper.adjust(value);
+            homePresenter.getGpuImage().requestRender();
+            onFilterApplied(homePresenter.getGpuImage().getBitmapWithFilterApplied());
+        }
+
+        @Override
+        public void onStartTrackingTouch(DiscreteSeekBar seekBar) {
+
+        }
+
+        @Override
+        public void onStopTrackingTouch(DiscreteSeekBar seekBar) {
+
+        }
+    };
 }

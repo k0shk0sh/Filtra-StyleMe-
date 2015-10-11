@@ -22,23 +22,24 @@ import com.style.me.hd.R;
 public class ViewHelper {
 
     public static void animateVisibility(final boolean show, final View view) {
-        view.animate().alpha(show ? 1F : 0F).setInterpolator(new AccelerateInterpolator()).setListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-                super.onAnimationStart(animation);
-                if (show) view.setVisibility(View.VISIBLE);
-            }
+        view.animate().alpha(show ? 1F : 0F).setDuration(500).setInterpolator(new AccelerateInterpolator())
+                .setListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationStart(Animator animation) {
+                        super.onAnimationStart(animation);
+                        if (show) view.setVisibility(View.VISIBLE);
+                    }
 
-            @Override
-            public void onAnimationEnd(@NonNull Animator animation) {
-                super.onAnimationEnd(animation);
-                if (!show) view.setVisibility(View.GONE);
-            }
-        });
+                    @Override
+                    public void onAnimationEnd(@NonNull Animator animation) {
+                        super.onAnimationEnd(animation);
+                        if (!show) view.setVisibility(View.GONE);
+                    }
+                });
     }
 
     public static void animateTranslateY(final int value, final boolean revertOnFinish, final View view) {
-        view.animate().translationY(value).setInterpolator(new AccelerateInterpolator()).setListener(new AnimatorListenerAdapter() {
+        view.animate().translationY(value).setDuration(500).setInterpolator(new AccelerateInterpolator()).setListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationStart(Animator animation) {
                 super.onAnimationStart(animation);
@@ -47,7 +48,7 @@ public class ViewHelper {
             @Override
             public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);
-                if (revertOnFinish) view.animate().translationY(0).setInterpolator(new AccelerateInterpolator());
+                if (revertOnFinish) animateTranslateY(0, false, view);
             }
         });
     }

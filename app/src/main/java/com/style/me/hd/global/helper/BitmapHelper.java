@@ -196,6 +196,7 @@ public class BitmapHelper {
                     public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
                         super.onLoadingComplete(imageUri, view, loadedImage);
                         applyPalette(homeModel, loadedImage);
+                        homeModel.setBitmap(loadedImage);
                         homeModel.hideProgress();
                         file.delete();
                     }
@@ -229,6 +230,7 @@ public class BitmapHelper {
             public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
                 super.onLoadingComplete(imageUri, view, loadedImage);
                 applyPalette(homeModel, loadedImage);
+                homeModel.setBitmap(loadedImage);
                 homeModel.hideProgress();
             }
 

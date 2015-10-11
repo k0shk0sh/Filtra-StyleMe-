@@ -7,4 +7,5 @@
     <string name="share_to">"Share To: "</string>
     <string name="frame">Frame</string>
     <string name="filtra_image">Filtra Image</string>
+    <string name="no_image">Error, No Image Found.</string>
 </resources>
