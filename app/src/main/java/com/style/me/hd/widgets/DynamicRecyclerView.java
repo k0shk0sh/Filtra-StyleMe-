@@ -15,19 +15,16 @@ public class DynamicRecyclerView extends RecyclerView {
     private View emptyView;
 
     private AdapterDataObserver observer = new AdapterDataObserver() {
-        @Override
-        public void onChanged() {
+        @Override public void onChanged() {
             showEmptyView();
         }
 
-        @Override
-        public void onItemRangeInserted(int positionStart, int itemCount) {
+        @Override public void onItemRangeInserted(int positionStart, int itemCount) {
             super.onItemRangeInserted(positionStart, itemCount);
             showEmptyView();
         }
 
-        @Override
-        public void onItemRangeRemoved(int positionStart, int itemCount) {
+        @Override public void onItemRangeRemoved(int positionStart, int itemCount) {
             super.onItemRangeRemoved(positionStart, itemCount);
             showEmptyView();
         }
@@ -59,16 +56,15 @@ public class DynamicRecyclerView extends RecyclerView {
 
     }
 
-    @Override
-    public void setAdapter(Adapter adapter) {
+    public void setEmptyView(View emptyView) {
+        this.emptyView = emptyView;
+    }
+
+    @Override public void setAdapter(Adapter adapter) {
         super.setAdapter(adapter);
         if (adapter != null) {
             adapter.registerAdapterDataObserver(observer);
             observer.onChanged();
         }
-    }
-
-    public void setEmptyView(View emptyView) {
-        this.emptyView = emptyView;
     }
 }

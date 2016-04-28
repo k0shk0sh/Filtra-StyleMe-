@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.design.widget.CoordinatorLayout
+    android:id="@+id/coordinator"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".Home">
+    tools:context=".view.Home">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appbar"
@@ -34,42 +35,37 @@
     </android.support.design.widget.AppBarLayout>
 
     <android.support.v4.widget.NestedScrollView
+        android:id="@+id/nestedScroll"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <LinearLayout
+        <io.codetail.widget.RevealLinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <com.style.me.hd.widgets.BoxCardLayout
+
+            <com.style.me.hd.widgets.BoxFrameLayout
                 android:id="@+id/cardHolder"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_margin="@dimen/activity_horizontal_margin"
-                app:cardBackgroundColor="@color/accent"
-                app:cardMaxElevation="5dp"
-                app:layout_behavior="@string/appbar_scrolling_view_behavior">
+                android:background="@color/accent">
 
-                <com.style.me.hd.widgets.BoxFrameLayout
+                <com.style.me.hd.widgets.ZoomableImage
+                    android:id="@+id/zoomImage"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:contentDescription="@string/filtra_image"/>
 
-                    <com.style.me.hd.widgets.ZoomableImage
-                        android:id="@+id/zoomImage"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_gravity="center"
-                        android:contentDescription="@string/filtra_image"/>
-
-                    <com.style.me.hd.widgets.SquareImageView
-                        android:id="@+id/frameImage"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:contentDescription="@string/frame"/>
-                </com.style.me.hd.widgets.BoxFrameLayout>
-            </com.style.me.hd.widgets.BoxCardLayout>
+                <com.style.me.hd.widgets.SquareImageView
+                    android:id="@+id/frameImage"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:contentDescription="@string/frame"/>
+            </com.style.me.hd.widgets.BoxFrameLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -167,7 +163,7 @@
                     android:layout_gravity="bottom|center"
                     android:layout_marginLeft="@dimen/activity_horizontal_margin"
                     android:layout_marginRight="@dimen/activity_horizontal_margin"
-                    android:visibility="invisible"
+                    android:visibility="gone"
                     app:dsb_allowTrackClickToDrag="true"
                     app:dsb_indicatorColor="@color/accent"
                     app:dsb_indicatorElevation="4dp"
@@ -181,9 +177,9 @@
 
                 <LinearLayout
                     android:id="@+id/recyclerHolder"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="bottom|left"
+                    android:layout_gravity="bottom|left|start"
                     android:orientation="horizontal"
                     android:visibility="invisible">
 
@@ -203,14 +199,13 @@
                     <android.support.v7.widget.RecyclerView
                         android:id="@+id/recycler"
                         android:layout_width="match_parent"
-                        android:layout_height="55dp"
+                        android:layout_height="wrap_content"
                         android:layout_gravity="center">
                     </android.support.v7.widget.RecyclerView>
                 </LinearLayout>
 
-
             </LinearLayout>
 
-        </LinearLayout>
+        </io.codetail.widget.RevealLinearLayout>
     </android.support.v4.widget.NestedScrollView>
 </android.support.design.widget.CoordinatorLayout>

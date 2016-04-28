@@ -1,6 +1,7 @@
 package com.style.me.hd.model;
 
 import android.content.Intent;
+import android.view.MenuItem;
 
 import com.style.me.hd.global.filter.FilterModel;
 
@@ -17,5 +18,7 @@ public interface PresenterModel {
 
     void onFrameClick(int color);
 
-    void onBakcgroundClick(int color);
+    void onBackgroundColor(int color);
+
+    boolean onOptionsItemSelected(MenuItem menuItem);
 }

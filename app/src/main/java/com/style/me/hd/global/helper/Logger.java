@@ -12,7 +12,7 @@ import org.json.JSONObject;
 /**
  * Created by Kosh on 10/11/2015. copyrights are reserved
  */
-public class LoggerHelper {
+public class Logger {
     private static boolean DEBUG = BuildConfig.DEBUG;
 
     public static void d(String tag, String arg) {
@@ -24,6 +24,12 @@ public class LoggerHelper {
     public static void d(String logMsg) {
         if (isEnable()) {
             log(getCurrentClassName(), getCurrentMethodName() + "(): " + logMsg);
+        }
+    }
+
+    public static void e(String logMsg) {
+        if (isEnable()) {
+            logE(getCurrentClassName(), getCurrentMethodName() + "(): " + logMsg);
         }
     }
 
@@ -50,6 +56,10 @@ public class LoggerHelper {
 
     private static void log(String tag, String msg) {
         Log.d(tag, msg);
+    }
+
+    private static void logE(String tag, String msg) {
+        Log.e(tag, msg);
     }
 
     private static String getSplitter(int length) {

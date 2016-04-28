@@ -8,8 +8,7 @@ import jp.co.cyberagent.android.gpuimage.GPUImageFilter;
 public abstract class AdjusterHelper<T extends GPUImageFilter> {
     private T filter;
 
-    @SuppressWarnings("unchecked")
-    public AdjusterHelper<T> filter(final GPUImageFilter filter) {
+    @SuppressWarnings("unchecked") public AdjusterHelper<T> filter(final GPUImageFilter filter) {
         this.filter = (T) filter;
         return this;
     }

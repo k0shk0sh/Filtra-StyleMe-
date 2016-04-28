@@ -10,6 +10,7 @@ import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.v4.widget.NestedScrollView;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -20,8 +21,11 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.Scroller;
 
+import com.style.me.hd.global.helper.Logger;
+
 public class ZoomableImage extends ImageView {
 
+    private NestedScrollView nestedScrollView;
     private static final String DEBUG = "DEBUG";
 
     //
@@ -44,6 +48,14 @@ public class ZoomableImage extends ImageView {
     // saved prior to the screen rotating.
     //
     private Matrix matrix, prevMatrix;
+
+    public NestedScrollView getNestedScrollView() {
+        return nestedScrollView;
+    }
+
+    public void setNestedScrollView(NestedScrollView nestedScrollView) {
+        this.nestedScrollView = nestedScrollView;
+    }
 
     public static enum State {NONE, DRAG, ZOOM, FLING, ANIMATE_ZOOM}
 
@@ -230,9 +242,8 @@ public class ZoomableImage extends ImageView {
     }
 
     /**
-     * After setting image, a value of true means the new image should maintain the zoom of the
-     * previous image. False means the image should be resized within the view. Defaults value is
-     * true.
+     * After setting image, a value of true means the new image should maintain the zoom of the previous image. False means the image should be
+     * resized within the view. Defaults value is true.
      *
      * @param maintainZoom
      */
@@ -241,8 +252,7 @@ public class ZoomableImage extends ImageView {
     }
 
     /**
-     * Get the current zoom. This is the zoom relative to the initial scale, not the original
-     * resource.
+     * Get the current zoom. This is the zoom relative to the initial scale, not the original resource.
      *
      * @return current zoom multiplier.
      */
@@ -262,8 +272,7 @@ public class ZoomableImage extends ImageView {
     }
 
     /**
-     * For a given point on the view (ie, a touch event), returns the point relative to the original
-     * drawable's coordinate system.
+     * For a given point on the view (ie, a touch event), returns the point relative to the original drawable's coordinate system.
      *
      * @param x
      * @param y
@@ -274,8 +283,7 @@ public class ZoomableImage extends ImageView {
     }
 
     /**
-     * For a given point on the view (ie, a touch event), returns the point relative to the original
-     * drawable's coordinate system.
+     * For a given point on the view (ie, a touch event), returns the point relative to the original drawable's coordinate system.
      *
      * @param p
      * @return PointF relative to original drawable's coordinate system.
@@ -301,11 +309,9 @@ public class ZoomableImage extends ImageView {
     }
 
     /**
-     * When transitioning from zooming from focus to zoom from center (or vice versa) the image can
-     * become unaligned within the view. This is apparent when zooming quickly. When the content
-     * size is less than the view size, the content will often be centered incorrectly within the
-     * view. fixScaleTrans first calls fixTrans() and then makes sure the image is centered
-     * correctly within the view.
+     * When transitioning from zooming from focus to zoom from center (or vice versa) the image can become unaligned within the view. This is apparent
+     * when zooming quickly. When the content size is less than the view size, the content will often be centered incorrectly within the view.
+     * fixScaleTrans first calls fixTrans() and then makes sure the image is centered correctly within the view.
      */
     private void fixScaleTrans() {
         fixTrans();
@@ -384,9 +390,8 @@ public class ZoomableImage extends ImageView {
     }
 
     /**
-     * If the normalizedScale is equal to 1, then the image is made to fit the screen. Otherwise, it
-     * is made to fit the screen according to the dimensions of the previous image matrix. This
-     * allows the image to maintain its zoom after rotation.
+     * If the normalizedScale is equal to 1, then the image is made to fit the screen. Otherwise, it is made to fit the screen according to the
+     * dimensions of the previous image matrix. This allows the image to maintain its zoom after rotation.
      */
     private void fitImageToView() {
         Drawable drawable = getDrawable();
@@ -491,9 +496,8 @@ public class ZoomableImage extends ImageView {
     }
 
     /**
-     * After rotating, the matrix needs to be translated. This function finds the area of image
-     * which was previously centered and adjusts translations so that is again the center,
-     * post-rotation.
+     * After rotating, the matrix needs to be translated. This function finds the area of image which was previously centered and adjusts translations
+     * so that is again the center, post-rotation.
      *
      * @param axis
      *         Matrix.MTRANS_X or Matrix.MTRANS_Y
@@ -510,7 +514,8 @@ public class ZoomableImage extends ImageView {
      * @param drawableSize
      *         width/height of drawable
      */
-    private void translateMatrixAfterRotate(int axis, float trans, float prevImageSize, float imageSize, int prevViewSize, int viewSize, int drawableSize) {
+    private void translateMatrixAfterRotate(int axis, float trans, float prevImageSize, float imageSize, int prevViewSize, int viewSize, int
+            drawableSize) {
         if (imageSize < viewSize) {
             //
             // The width/height of image is less than the view's width/height. Center it.
@@ -535,12 +540,13 @@ public class ZoomableImage extends ImageView {
     }
 
     private void setState(State state) {
+        Logger.d(state.name());
+//        if (nestedScrollView != null) ViewCompat.setNestedScrollingEnabled(nestedScrollView, state == State.NONE);
         this.state = state;
     }
 
     /**
-     * Gesture Listener detects a single click or long click and passes that on to the view's
-     * listener.
+     * Gesture Listener detects a single click or long click and passes that on to the view's listener.
      *
      * @author Ortiz
      */
@@ -584,8 +590,7 @@ public class ZoomableImage extends ImageView {
     }
 
     /**
-     * Responsible for all touch events. Handles the heavy lifting of drag and also sends touch
-     * events to Scale Detector and Gesture Detector.
+     * Responsible for all touch events. Handles the heavy lifting of drag and also sends touch events to Scale Detector and Gesture Detector.
      *
      * @author Ortiz
      */
@@ -705,8 +710,7 @@ public class ZoomableImage extends ImageView {
     }
 
     /**
-     * DoubleTapZoom calls a series of runnables which apply an animated zoom in/out graphic to the
-     * image.
+     * DoubleTapZoom calls a series of runnables which apply an animated zoom in/out graphic to the image.
      *
      * @author Ortiz
      */
@@ -762,8 +766,8 @@ public class ZoomableImage extends ImageView {
         }
 
         /**
-         * Interpolate between where the image should start and end in order to translate the image
-         * so that the point that is touched is what ends up centered at the end of the zoom.
+         * Interpolate between where the image should start and end in order to translate the image so that the point that is touched is what ends up
+         * centered at the end of the zoom.
          *
          * @param t
          */
@@ -799,16 +803,14 @@ public class ZoomableImage extends ImageView {
     }
 
     /**
-     * This function will transform the coordinates in the touch event to the coordinate system of
-     * the drawable that the imageview contain
+     * This function will transform the coordinates in the touch event to the coordinate system of the drawable that the imageview contain
      *
      * @param x
      *         x-coordinate of touch event
      * @param y
      *         y-coordinate of touch event
      * @param clipToBitmap
-     *         Touch event may occur within view, but outside image content. True, to clip return
-     *         value to the bounds of the bitmap size.
+     *         Touch event may occur within view, but outside image content. True, to clip return value to the bounds of the bitmap size.
      * @return Coordinates of the point touched, in the coordinate system of the original drawable.
      */
     private PointF transformCoordTouchToBitmap(float x, float y, boolean clipToBitmap) {
@@ -829,8 +831,8 @@ public class ZoomableImage extends ImageView {
     }
 
     /**
-     * Inverse of transformCoordTouchToBitmap. This function will transform the coordinates in the
-     * drawable's coordinate system to the view's coordinate system.
+     * Inverse of transformCoordTouchToBitmap. This function will transform the coordinates in the drawable's coordinate system to the view's
+     * coordinate system.
      *
      * @param bx
      *         x-coordinate in original bitmap coordinate system
@@ -850,8 +852,8 @@ public class ZoomableImage extends ImageView {
     }
 
     /**
-     * Fling launches sequential runnables which apply the fling graphic to the image. The values
-     * for the translation are interpolated by the Scroller.
+     * Fling launches sequential runnables which apply the fling graphic to the image. The values for the translation are interpolated by the
+     * Scroller.
      *
      * @author Ortiz
      */

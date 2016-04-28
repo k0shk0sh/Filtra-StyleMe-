@@ -30,26 +30,38 @@ public class FastBitmapDrawable extends Drawable {
         }
     }
 
-    @Override
-    public void draw(Canvas canvas) {
+    @Override public void draw(Canvas canvas) {
         final Rect r = getBounds();
         canvas.drawBitmap(mBitmap, r.left, r.top, mPaint);
     }
 
-    @Override
-    public void setColorFilter(ColorFilter cf) {
+    @Override public void setColorFilter(ColorFilter cf) {
         mPaint.setColorFilter(cf);
     }
 
-    @Override
-    public int getOpacity() {
+    @Override public int getOpacity() {
         return PixelFormat.TRANSLUCENT;
     }
 
-    @Override
-    public void setAlpha(int alpha) {
+    @Override public void setAlpha(int alpha) {
         mAlpha = alpha;
         mPaint.setAlpha(alpha);
+    }
+
+    @Override public int getIntrinsicWidth() {
+        return mWidth;
+    }
+
+    @Override public int getIntrinsicHeight() {
+        return mHeight;
+    }
+
+    @Override public int getMinimumWidth() {
+        return mWidth;
+    }
+
+    @Override public int getMinimumHeight() {
+        return mHeight;
     }
 
     public void setFilterBitmap(boolean filterBitmap) {
@@ -58,26 +70,6 @@ public class FastBitmapDrawable extends Drawable {
 
     public int getAlpha() {
         return mAlpha;
-    }
-
-    @Override
-    public int getIntrinsicWidth() {
-        return mWidth;
-    }
-
-    @Override
-    public int getIntrinsicHeight() {
-        return mHeight;
-    }
-
-    @Override
-    public int getMinimumWidth() {
-        return mWidth;
-    }
-
-    @Override
-    public int getMinimumHeight() {
-        return mHeight;
     }
 
     public void setBitmap(Bitmap b) {

@@ -18,8 +18,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 
 /**
- * Created by Kosh on 10/11/2015. copyrights are reserved
- * h566UniFi
+ * Created by Kosh on 10/11/2015. copyrights are reserved h566UniFi
  */
 public class FiltersAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private List<FilterModel> filterModelList;
@@ -37,8 +36,8 @@ public class FiltersAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, final int position) {
-        CommonHolder holder = (CommonHolder) viewHolder;
+    public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
+        final CommonHolder holder = (CommonHolder) viewHolder;
         ColorGenerator generator = ColorGenerator.MATERIAL;
         int color = generator.getColor(position);
         TextDrawable.IBuilder builder = TextDrawable.builder()
@@ -49,7 +48,7 @@ public class FiltersAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                homePresenter.onFilterClick(filterModelList.get(position));
+                homePresenter.onFilterClick(filterModelList.get(holder.getAdapterPosition()));
             }
         });
     }

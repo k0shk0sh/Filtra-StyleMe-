@@ -27,15 +27,13 @@ public class FramesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         this.colors = colors;
     }
 
-    @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    @Override public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.filters_list_item, parent, false);
         return new CommonHolder(view);
     }
 
-    @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, final int position) {
-        CommonHolder holder = (CommonHolder) viewHolder;
+    @Override public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
+        final CommonHolder holder = (CommonHolder) viewHolder;
         int color = Color.parseColor(colors[position]);
         TextDrawable.IBuilder builder = TextDrawable.builder()
                 .beginConfig()
@@ -45,20 +43,19 @@ public class FramesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                homePresenter.onFrameClick(Color.parseColor(colors[position]));
+                homePresenter.onFrameClick(Color.parseColor(colors[holder.getAdapterPosition()]));
             }
         });
         holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                homePresenter.onBakcgroundClick(Color.parseColor(colors[position]));
+                homePresenter.onBackgroundColor(Color.parseColor(colors[holder.getAdapterPosition()]));
                 return true;
             }
         });
     }
 
-    @Override
-    public int getItemCount() {
+    @Override public int getItemCount() {
         return colors.length;
     }
 

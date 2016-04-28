@@ -1,5 +1,6 @@
 package com.style.me.hd.view;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -9,15 +10,19 @@ import android.hardware.SensorManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -28,9 +33,10 @@ import com.style.me.hd.global.adapter.FiltersAdapter;
 import com.style.me.hd.global.adapter.FramesAdapter;
 import com.style.me.hd.global.filter.FilterModel;
 import com.style.me.hd.global.filter.adjuster.FilterAdjuster;
-import com.style.me.hd.global.helper.BitmapHelper;
+import com.style.me.hd.global.helper.AnimUtil;
 import com.style.me.hd.global.helper.FileHelper;
 import com.style.me.hd.global.helper.InputHelper;
+import com.style.me.hd.global.helper.PermissionHelper;
 import com.style.me.hd.global.helper.ViewHelper;
 import com.style.me.hd.model.HomeModel;
 import com.style.me.hd.presenter.HomePresenter;
@@ -41,47 +47,44 @@ import com.style.me.hd.widgets.ZoomableImage;
 import org.adw.library.widgets.discreteseekbar.DiscreteSeekBar;
 
 import java.io.File;
+import java.util.List;
 import java.util.Random;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import pub.devrel.easypermissions.AfterPermissionGranted;
+import pub.devrel.easypermissions.EasyPermissions;
 
-public class Home extends AppCompatActivity implements HomeModel, ShakeDetector.Listener {
+public class Home extends AppCompatActivity implements HomeModel, ShakeDetector.Listener, EasyPermissions.PermissionCallbacks {
 
     private HomePresenter homePresenter;
     private File file;
     private Bitmap bitmap;
-    private FilterAdjuster helper;
     private FiltersAdapter commonAdapter;
     private FramesAdapter framesAdapter;
     private ShakeDetector shakeDetector;
     private SensorManager sensorManager;
-    @Bind(R.id.frameImage)
-    SquareImageView frameImage;
-    @Bind(R.id.progressHolder)
-    LinearLayout progressHolder;
-    @Bind(R.id.appbar)
-    AppBarLayout appbar;
-    @Bind(R.id.metaball)
-    MetaballView metaball;
-    @Bind(R.id.toolbar)
-    Toolbar toolbar;
-    @Bind(R.id.cardHolder)
-    CardView cardHolder;
-    @Bind(R.id.zoomImage)
-    ZoomableImage zoomImage;
-    @Bind(R.id.recycler)
-    RecyclerView recycler;
-    @Bind(R.id.recyclerHolder)
-    LinearLayout recyclerHolder;
-    @Bind(R.id.seek)
-    DiscreteSeekBar seek;
-    @Bind(R.id.optionsHolder)
-    LinearLayout optionsHolder;
+    @Bind(R.id.frameImage) SquareImageView frameImage;
+    @Bind(R.id.progressHolder) LinearLayout progressHolder;
+    @Bind(R.id.appbar) AppBarLayout appbar;
+    @Bind(R.id.metaball) MetaballView metaball;
+    @Bind(R.id.toolbar) Toolbar toolbar;
+    @Bind(R.id.cardHolder) View cardHolder;
+    @Bind(R.id.zoomImage) ZoomableImage zoomImage;
+    @Bind(R.id.recycler) RecyclerView recycler;
+    @Bind(R.id.recyclerHolder) LinearLayout recyclerHolder;
+    @Bind(R.id.seek) DiscreteSeekBar seek;
+    @Bind(R.id.optionsHolder) LinearLayout optionsHolder;
+    @Bind(R.id.frames) FloatingActionButton frames;
+    @Bind(R.id.gallery) FloatingActionButton gallery;
+    @Bind(R.id.camera) FloatingActionButton camera;
+    @Bind(R.id.filter) FloatingActionButton filter;
+    @Bind(R.id.cancel) FloatingActionButton cancel;
+    @Bind(R.id.nestedScroll) NestedScrollView nestedScrollView;
+    @Bind(R.id.coordinator) CoordinatorLayout coordinator;
 
-    @OnClick(R.id.filter)
-    void onFilter() {
+    @OnClick(R.id.filter) void onFilter() {
         hideSeekBar();
         if (recycler.getAdapter() == null) {
             recycler.setAdapter(commonAdapter);
@@ -89,11 +92,11 @@ public class Home extends AppCompatActivity implements HomeModel, ShakeDetector.
         if (recycler.getAdapter() instanceof FramesAdapter) {
             recycler.setAdapter(commonAdapter);
         }
-        ViewHelper.animateVisibility(true, recyclerHolder);
+        scrollBottom();
+        AnimUtil.circularRevealFromTop(recyclerHolder, filter, true);
     }
 
-    @OnClick(R.id.frames)
-    void onFrame() {
+    @OnClick(R.id.frames) void onFrame() {
         hideSeekBar();
         if (recycler.getAdapter() == null) {
             recycler.setAdapter(framesAdapter);
@@ -101,231 +104,199 @@ public class Home extends AppCompatActivity implements HomeModel, ShakeDetector.
         if (recycler.getAdapter() instanceof FiltersAdapter) {
             recycler.setAdapter(framesAdapter);
         }
-        ViewHelper.animateVisibility(true, recyclerHolder);
+        scrollBottom();
+        AnimUtil.circularRevealFromTop(recyclerHolder, frames, true);
     }
 
-    @OnClick(R.id.cancel)
-    void onCancel() {
-        ViewHelper.animateVisibility(false, recyclerHolder);
+    @OnClick(R.id.cancel) void onCancel() {
+        AnimUtil.circularRevealFromTop(recyclerHolder, cancel, false);
         hideSeekBar();
+        scrollTop();
     }
 
-    @OnClick(R.id.camera)
-    void onCamera() {
+    @AfterPermissionGranted(HomePresenter.CAMERA_INTENT)
+    @OnClick(R.id.camera) void onCamera() {
         hideSeekBar();
-        file = FileHelper.generateFile();
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(file));
-            startActivityForResult(takePictureIntent, HomePresenter.CAMERA_INTENT);
+        if (PermissionHelper.isPermissionGranted(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            file = FileHelper.generateFile();
+            Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(file));
+                startActivityForResult(takePictureIntent, HomePresenter.CAMERA_INTENT);
+            } else {
+                onError(getString(R.string.no_camera));
+            }
         } else {
-            onError(getString(R.string.no_camera));
+            EasyPermissions.requestPermissions(this, "Permission Required",
+                    HomePresenter.CAMERA_INTENT, Manifest.permission.WRITE_EXTERNAL_STORAGE);
         }
     }
 
-    @OnClick(R.id.gallery)
-    void onGallery() {
+    @AfterPermissionGranted(HomePresenter.GALLERY_INTENT)
+    @OnClick(R.id.gallery) void onGallery() {
         hideSeekBar();
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        intent.setType("image/*");
-        startActivityForResult(Intent.createChooser(intent, "Select Image"), HomePresenter.GALLERY_INTENT);
+        if (PermissionHelper.isPermissionGranted(this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
+            Intent intent = new Intent(Intent.ACTION_GET_CONTENT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+            intent.setType("image/*");
+            startActivityForResult(Intent.createChooser(intent, "Select Image"), HomePresenter.GALLERY_INTENT);
+        } else {
+            EasyPermissions.requestPermissions(this, "Permission Required",
+                    HomePresenter.GALLERY_INTENT, Manifest.permission.READ_EXTERNAL_STORAGE);
+        }
     }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setTitle("");
         setContentView(R.layout.activity_home);
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
         metaball.setPaintMode(0);
-        homePresenter = new HomePresenter(this);
         FilterModel filter = new FilterModel(this);
-        commonAdapter = new FiltersAdapter(homePresenter, filter.getFilters());
-        framesAdapter = new FramesAdapter(homePresenter, getResources().getStringArray(R.array.colors));
+        commonAdapter = new FiltersAdapter(presenter(), filter.getFilters());
+        framesAdapter = new FramesAdapter(presenter(), getResources().getStringArray(R.array.colors));
         recycler.setItemAnimator(new DefaultItemAnimator());
         recycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         recycler.setHasFixedSize(true);
-        seek.setOnProgressChangeListener(onFilterAdjusted);
+        seek.setOnProgressChangeListener(presenter().onFilterAdjusted);
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         shakeDetector = new ShakeDetector(this);
+        zoomImage.setNestedScrollView(nestedScrollView);
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    @Override public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
         return true;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        hideSeekBar();
-        if (item.getItemId() == R.id.save) {
-            if (getBitmap() != null) {
-                String path = BitmapHelper.saveBitmap(cardHolder);
-                if (!InputHelper.isEmpty(path)) {
-                    onError(getString(R.string.image_saved));
-                } else {
-                    onError(getString(R.string.error_save));
-                }
-            } else {
-                onError(getString(R.string.no_image));
-            }
-            return true;
-        } else if (item.getItemId() == R.id.share) {
-            if (getBitmap() != null) {
-                String path = BitmapHelper.saveBitmap(cardHolder);
-                if (!InputHelper.isEmpty(path)) {
-                    Intent shareIntent = new Intent();
-                    shareIntent.setAction(Intent.ACTION_SEND);
-                    shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(new File(path)));
-                    shareIntent.setType("image/*");
-                    startActivity(Intent.createChooser(shareIntent, getString(R.string.share_to)));
-                    onError(getString(R.string.image_saved));
-                } else {
-                    onError(getString(R.string.error_save));
-                }
-            } else {
-                onError(getString(R.string.no_image));
-            }
-            return true;
-        } else if (item.getItemId() == R.id.removeFilter) {
-            if (getBitmap() != null) {
-                zoomImage.setImageBitmap(getBitmap());
-                homePresenter.getGpuImage().deleteImage();
-            } else {
-                onError(getString(R.string.no_image));
-            }
-            return true;
-        } else if (item.getItemId() == R.id.removeBackground) {
-            cardHolder.setCardBackgroundColor(0);
-            return true;
-        } else if (item.getItemId() == R.id.removeFrame) {
-            frameImage.setImageDrawable(null);
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
+    @Override public boolean onOptionsItemSelected(MenuItem item) {
+        return presenter().onOptionsItemSelected(item);
     }
 
-    @Override
-    protected void onDestroy() {
+    @Override protected void onDestroy() {
         if (!bitmap.isRecycled()) bitmap.recycle();
-        if (homePresenter.getGpuImage() != null) homePresenter.getGpuImage().deleteImage();
+        if (presenter().getGpuImage() != null) presenter().getGpuImage().deleteImage();
         super.onDestroy();
     }
 
-    @Override
-    protected void onPause() {
+    @Override protected void onPause() {
         super.onPause();
         shakeDetector.stop();
     }
 
-    @Override
-    protected void onResume() {
+    @Override protected void onResume() {
         super.onResume();
         shakeDetector.start(sensorManager);
     }
 
-    @Override
-    public Context getContext() {
+    @Override public Context getContext() {
         return this;
     }
 
-    @Override
-    public void onFilterApplied(Bitmap bitmap) {
+    @Override public void onFilterApplied(Bitmap bitmap) {
         zoomImage.setImageBitmap(bitmap);
     }
 
-    @Override
-    public void onBackgroundApplied(int color) {
-        cardHolder.setCardBackgroundColor(color);
+    @Override public void onBackgroundApplied(int color) {
+        AnimUtil.animateColorChange(cardHolder, color, null);
     }
 
-    @Override
-    public void onFrameSelected(Drawable drawable) {
+    @Override public void onFrameSelected(Drawable drawable) {
         frameImage.setImageDrawable(drawable);
     }
 
-    @Override
-    public void onError(String cause) {
+    @Override public void onError(String cause) {
         Toast.makeText(this, InputHelper.isEmpty(cause) ? getString(R.string.general_error_message) : cause, Toast.LENGTH_LONG).show();
     }
 
-    @Override
-    public void showProgress() {
+    @Override public void showProgress() {
         ViewHelper.animateTranslateY(-appbar.getHeight(), false, appbar);
         ViewHelper.animateTranslateY(optionsHolder.getHeight(), false, optionsHolder);
         ViewHelper.animateVisibility(true, progressHolder);
     }
 
-    @Override
-    public void hideProgress() {
+    @Override public void hideProgress() {
         ViewHelper.animateTranslateY(0, false, appbar);
         ViewHelper.animateTranslateY(0, false, optionsHolder);
         ViewHelper.animateVisibility(false, progressHolder);
 
     }
 
-    @Override
-    public void setBitmap(Bitmap bitmap) {
+    @Override public void setBitmap(Bitmap bitmap) {
         this.bitmap = bitmap;
     }
 
-    @Override
-    public Bitmap getBitmap() {
+    @Override public Bitmap getBitmap() {
         return bitmap;
     }
 
-    @Override
-    public ImageView getImageView() {
+    @Override public ImageView getImageView() {
         return zoomImage;
     }
 
-    @Override
-    public void showSeekBar(FilterAdjuster helper) {
-        this.helper = helper;
+    @Override public void showSeekBar(FilterAdjuster helper) {
         seek.setProgress(20);
         ViewHelper.animateVisibility(true, seek);
     }
 
-    @Override
-    public void hideSeekBar() {
+    @Override public void hideSeekBar() {
         ViewHelper.animateVisibility(false, seek);
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        homePresenter.onActivityForResult(requestCode, resultCode, data, file);
+    @Override public View cardHolder() {
+        return cardHolder;
+    }
+
+    @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        presenter().onActivityForResult(requestCode, resultCode, data, file);
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    private DiscreteSeekBar.OnProgressChangeListener onFilterAdjusted = new DiscreteSeekBar.OnProgressChangeListener() {
-        @Override
-        public void onProgressChanged(DiscreteSeekBar seekBar, int value, boolean fromUser) {
-            if (homePresenter.getGpuImage().getBitmapWithFilterApplied() != null) {
-                if (helper != null) helper.adjust(value);
-                homePresenter.getGpuImage().requestRender();
-                onFilterApplied(homePresenter.getGpuImage().getBitmapWithFilterApplied());
-            } else {
-                ViewHelper.animateVisibility(fromUser, seekBar);
-            }
-        }
-
-        @Override
-        public void onStartTrackingTouch(DiscreteSeekBar seekBar) {}
-
-        @Override
-        public void onStopTrackingTouch(DiscreteSeekBar seekBar) {}
-    };
-
-    @Override
-    public void hearShake() {
+    @Override public void hearShake() {
         if (getBitmap() == null) {
             onError(getString(R.string.no_image));
             return;
         }
-        homePresenter.onFilterClick(commonAdapter.getFilterModelList().get(new Random().nextInt(commonAdapter.getItemCount() - 1)));
-        homePresenter.onBakcgroundClick(Color.parseColor(framesAdapter.getColors()[new Random().nextInt(framesAdapter.getItemCount() - 1)]));
-        homePresenter.onFrameClick(Color.parseColor(framesAdapter.getColors()[new Random().nextInt(framesAdapter.getItemCount() - 1)]));
+        presenter().onFilterClick(commonAdapter.getFilterModelList().get(new Random().nextInt(commonAdapter.getItemCount() - 1)));
+        presenter().onBackgroundColor(Color.parseColor(framesAdapter.getColors()[new Random().nextInt(framesAdapter.getItemCount() - 1)]));
+        presenter().onFrameClick(Color.parseColor(framesAdapter.getColors()[new Random().nextInt(framesAdapter.getItemCount() - 1)]));
+    }
+
+    @Override public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
+    }
+
+    @Override public void onPermissionsGranted(int requestCode, List<String> perms) {
+        if (requestCode == HomePresenter.CAMERA_INTENT) {
+            onCamera();
+        } else if (requestCode == HomePresenter.GALLERY_INTENT) {
+            onGallery();
+        }
+    }
+
+    @Override public void onPermissionsDenied(int requestCode, List<String> perms) {
+
+    }
+
+    private void scrollBottom() {
+        CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) appbar.getLayoutParams();
+        AppBarLayout.Behavior behavior = (AppBarLayout.Behavior) params.getBehavior();
+        if (behavior != null) {
+            behavior.onNestedFling(coordinator, appbar, null, 0, -params.height, true);
+        }
+    }
+
+    private void scrollTop() {
+        CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) appbar.getLayoutParams();
+        AppBarLayout.Behavior behavior = (AppBarLayout.Behavior) params.getBehavior();
+        if (behavior != null) {
+            behavior.onNestedFling(coordinator, appbar, null, 0, params.height, true);
+        }
+    }
+
+    private HomePresenter presenter() {
+        if (homePresenter == null) homePresenter = new HomePresenter(this);
+        return homePresenter;
     }
 }

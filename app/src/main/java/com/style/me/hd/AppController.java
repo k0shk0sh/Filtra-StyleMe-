@@ -25,8 +25,7 @@ public class AppController extends Application {
 
     private final int MAX_AGE = 1200000;//20minutes
 
-    @Override
-    public void onCreate() {
+    @Override public void onCreate() {
         super.onCreate();
         FileHelper.initFolderName(getString(R.string.app_name));
         FileHelper.initPrivateFolder(this, getString(R.string.app_name));
@@ -66,14 +65,12 @@ public class AppController extends Application {
                 .build();
     }
 
-    @Override
-    public void onLowMemory() {
+    @Override public void onLowMemory() {
         getImageLoader().clearMemoryCache();
         super.onLowMemory();
     }
 
-    @Override
-    public void onTrimMemory(int level) {
+    @Override public void onTrimMemory(int level) {
         super.onTrimMemory(level);
         if (level == Activity.TRIM_MEMORY_BACKGROUND || level == Activity.TRIM_MEMORY_RUNNING_LOW) {
             getImageLoader().clearMemoryCache();
